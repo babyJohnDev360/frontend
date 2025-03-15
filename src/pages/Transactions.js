@@ -16,7 +16,7 @@ function Transactions() {
     setLoading(true);
     try {
       const response = await apiService.listUsers(); // Assuming transactions are part of the user list for simplicity
-      setTransactions(response);
+      setTransactions(response?.users);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
