@@ -1,10 +1,13 @@
 import React from 'react';
+import { AppBar, Toolbar, Typography } from '@mui/material';
 
 function Header() {
   return (
-    <header>
-      <h1>Admin Panel</h1>
-    </header>
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6">Admin Panel</Typography>
+      </Toolbar>
+    </AppBar>
   );
 }
 

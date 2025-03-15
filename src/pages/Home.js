@@ -1,11 +1,48 @@
 import React from 'react';
+import { Grid, Typography, Button, Card, CardContent, CardHeader, Table } from '@mui/material';
 
 function Home() {
   return (
-    <div>
-      <h2>Home</h2>
-      <p>Welcome to the Admin Panel. Navigate using the links above.</p>
-    </div>
+    <Grid container spacing={2}>
+      <Grid item xs={12}><Typography variant="h4">Admin Dashboard</Typography></Grid>
+      
+      <Grid container spacing={2}>
+        <Grid item xs={6} md={3}>
+          <Card>
+            <CardHeader title="Total Customers" />
+            <CardContent>
+              <Typography variant="h5">250</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <Card>
+            <CardHeader title="Total Transactions" />
+            <CardContent>
+              <Typography variant="h5">$1.2M</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <Card>
+            <CardHeader title="Pending Withdrawals" />
+            <CardContent>
+              <Typography variant="h5">$50K</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={12}><Typography variant="h6">Live Stock Ticker</Typography></Grid>
+      <Grid item xs={12}><Table> {/* Stock Ticker Table */} </Table></Grid>
+
+      <Grid item xs={12} container spacing={2}>
+        <Grid item xs={3}><Button variant="contained" fullWidth>Profile</Button></Grid>
+        <Grid item xs={3}><Button variant="contained" fullWidth>Trading Summary</Button></Grid>
+        <Grid item xs={3}><Button variant="contained" fullWidth>Transactions</Button></Grid>
+        <Grid item xs={3}><Button variant="contained" fullWidth>Withdrawal Status</Button></Grid>
+      </Grid>
+    </Grid>
   );
 }
 

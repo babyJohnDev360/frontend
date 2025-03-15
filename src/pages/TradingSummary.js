@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { Typography, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import Loader from '../components/common/Loader';
+import apiService from '../api/apiService';
 
 function TradingSummary() {
   const [loading, setLoading] = useState(true);
   const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    // Simulate a fetch call to get trading summaries
-    setTimeout(() => {
-      // This is where you would fetch your trading summaries data
-      setTrades([
-        { id: 1, stock: 'AAPL', buyPrice: 150, sellPrice: 155, volume: 10 },
-        { id: 2, stock: 'GOOGL', buyPrice: 2500, sellPrice: 2520, volume: 5 },
-        // Add more trades as needed
-      ]);
-      setLoading(false);
-    }, 2000); // Simulate a 2-second delay for fetching data
+    fetchTrades();
   }, []);
+
+  const fetchTrades = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.getFund();
+      setTrades(response);
+    } catch (error) {
+      console.error('Error fetching trades:', error);
+    }
+    setLoading(false);
+  };
 
   if (loading) {
     return <Loader />;
@@ -24,14 +28,27 @@ function TradingSummary() {
 
   return (
     <div>
-      <h2>Trading Summary</h2>
-      <ul>
-        {trades.map(trade => (
-          <li key={trade.id}>
-            {trade.stock}: Bought at ${trade.buyPrice}, Sold at ${trade.sellPrice}, Volume: {trade.volume}
-          </li>
-        ))}
-      </ul>
+      <Typography variant="h5">Trading Summary</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Stock</TableCell>
+            <TableCell>Buy Price</TableCell>
+            <TableCell>Sell Price</TableCell>
+            <TableCell>Volume</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {trades.map(trade => (
+            <TableRow key={trade.id}>
+              <TableCell>{trade.stock}</TableCell>
+              <TableCell>{trade.buyPrice}</TableCell>
+              <TableCell>{trade.sellPrice}</TableCell>
+              <TableCell>{trade.volume}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

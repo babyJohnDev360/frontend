@@ -1,22 +1,41 @@
 import React, { useState, useEffect } from 'react';
+import { Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, Alert } from '@mui/material';
 import Loader from '../components/common/Loader';
+import apiService from '../api/apiService';
 
 function WithdrawalStatus() {
   const [loading, setLoading] = useState(true);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [balancePayable, setBalancePayable] = useState(0);
 
   useEffect(() => {
-    // Simulate a fetch call to get withdrawal status
-    setTimeout(() => {
-      // This is where you would fetch your withdrawal status data
-      setWithdrawals([
-        { id: 1, amount: 1000, status: 'Approved', date: '2025-03-01' },
-        { id: 2, amount: 500, status: 'Pending', date: '2025-03-02' },
-        // Add more withdrawals as needed
-      ]);
-      setLoading(false);
-    }, 2000); // Simulate a 2-second delay for fetching data
+    fetchWithdrawals();
   }, []);
+
+  const fetchWithdrawals = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.getFund(); // Assuming withdrawals are part of the fund data for simplicity
+      setWithdrawals(response);
+      setBalancePayable(0); // Set the balance payable as needed
+    } catch (error) {
+      console.error('Error fetching withdrawals:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleApprove = async (id) => {
+    // Handle approve logic
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await apiService.removeFund(id);
+      fetchWithdrawals();
+    } catch (error) {
+      console.error('Error rejecting withdrawal:', error);
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -24,14 +43,33 @@ function WithdrawalStatus() {
 
   return (
     <div>
-      <h2>Withdrawal Status</h2>
-      <ul>
-        {withdrawals.map(withdrawal => (
-          <li key={withdrawal.id}>
-            {withdrawal.date}: ${withdrawal.amount} - {withdrawal.status}
-          </li>
-        ))}
-      </ul>
+      <Typography variant="h5">Withdrawal Status</Typography>
+      {balancePayable > 0 && (
+        <Alert severity="error">Withdrawal Rejected: Unpaid Service Fees!</Alert>
+      )}
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell>Amount</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {withdrawals.map(withdrawal => (
+            <TableRow key={withdrawal.id}>
+              <TableCell>{withdrawal.date}</TableCell>
+              <TableCell>${withdrawal.amount}</TableCell>
+              <TableCell>{withdrawal.status}</TableCell>
+              <TableCell>
+                <Button variant="contained" color="success" onClick={() => handleApprove(withdrawal.id)}>Approve</Button>
+                <Button variant="contained" color="error" onClick={() => handleReject(withdrawal.id)}>Reject</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

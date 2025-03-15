@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const API_BASE_URL = 'https://backend-squ3.onrender.com';
 // const API_BASE_URL = 'http://localhost:4000';
-
 
 // Helper function to handle errors
 const handleError = (error) => {
@@ -10,14 +10,16 @@ const handleError = (error) => {
     console.error('Response data:', error.response.data);
     console.error('Response status:', error.response.status);
     console.error('Response headers:', error.response.headers);
+    toast.error(error.response.data.message || 'An error occurred.');
   } else if (error.request) {
     console.error('Request data:', error.request);
+    toast.error('No response from server. Please try again.');
   } else {
     console.error('Error message:', error.message);
+    toast.error('An error occurred. Please try again.');
   }
   console.error('Config:', error.config);
 };
-
 const apiService = {
   login: async (email, password) => {
     try {
@@ -51,9 +53,9 @@ const apiService = {
     }
   },
 
-  deleteUser: async () => {
+  deleteUser: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/list`);
+      const response = await axios.delete(`${API_BASE_URL}/user/${id}`);
       return response.data;
     } catch (error) {
       handleError(error);
@@ -81,9 +83,9 @@ const apiService = {
     }
   },
 
-  updateFund: async () => {
+  updateFund: async (fundData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/updateFund`);
+      const response = await axios.post(`${API_BASE_URL}/user/updateFund`, fundData);
       return response.data;
     } catch (error) {
       handleError(error);
@@ -101,9 +103,9 @@ const apiService = {
     }
   },
 
-  removeFund: async () => {
+  removeFund: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/removeFund`);
+      const response = await axios.delete(`${API_BASE_URL}/user/removeFund/${id}`);
       return response.data;
     } catch (error) {
       handleError(error);
@@ -111,9 +113,9 @@ const apiService = {
     }
   },
 
-  updateServiceFee: async () => {
+  updateServiceFee: async (feeData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/updateServiceFee`);
+      const response = await axios.post(`${API_BASE_URL}/user/updateServiceFee`, feeData);
       return response.data;
     } catch (error) {
       handleError(error);
@@ -131,9 +133,9 @@ const apiService = {
     }
   },
 
-  removeServiceFee: async () => {
+  removeServiceFee: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/removeServiceFee`);
+      const response = await axios.delete(`${API_BASE_URL}/user/removeServiceFee/${id}`);
       return response.data;
     } catch (error) {
       handleError(error);
