@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Table, TableHead, TableRow, TableCell, TableBody, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
+import {
+  TextField, Button, Table, TableHead, TableRow, TableCell, TableBody, Dialog,
+  DialogActions, DialogContent, DialogTitle, IconButton, Typography, Box,
+  InputAdornment
+} from '@mui/material';
 import Loader from '../components/common/Loader';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import apiService from '../api/apiService';
 
 function ProfileManagement() {
   const [loading, setLoading] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [open, setOpen] = useState(false);
-  const [currentProfile, setCurrentProfile] = useState({ id: null, name: '', email: '', phone: '', bankDetails: { accountNo: '', branch: '', ifsc: '' }, panNumber: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentProfile, setCurrentProfile] = useState({
+    id: null,
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    panNo: '',
+    bankDetails: { name: '', accountNo: '', branch: '', ifsc: '' },
+    isActive: false
+  });
 
   useEffect(() => {
     fetchProfiles();
@@ -19,7 +36,7 @@ function ProfileManagement() {
     setLoading(true);
     try {
       const response = await apiService.listUsers();
-      setProfiles(response.users);
+      setProfiles(response?.users);
     } catch (error) {
       console.error('Error fetching profiles:', error);
     }
@@ -36,16 +53,27 @@ function ProfileManagement() {
     }
   };
 
-  const handleAddProfile = async () => {
+  const handleSaveProfile = async () => {
     try {
-      if (currentProfile.id) {
+      if (isEditMode) {
+        console.log("innerHeight",currentProfile);
+        
         await apiService.updateUser(currentProfile);
       } else {
         await apiService.createUser(currentProfile);
       }
       fetchProfiles();
       setOpen(false);
-      setCurrentProfile({ id: null, name: '', email: '', phone: '', bankDetails: { accountNo: '', branch: '', ifsc: '' }, panNumber: '' });
+      setCurrentProfile({
+        id: null,
+        name: '',
+        email: '',
+        password: '',
+        phone: '',
+        panNo: '',
+        bankDetails: { name: '', accountNo: '', branch: '', ifsc: '' },
+        isActive: false
+      });
     } catch (error) {
       console.error('Error saving profile:', error);
     }
@@ -53,6 +81,7 @@ function ProfileManagement() {
 
   const handleEditProfile = (profile) => {
     setCurrentProfile(profile);
+    setIsEditMode(true);
     setOpen(true);
   };
 
@@ -63,6 +92,10 @@ function ProfileManagement() {
     } catch (error) {
       console.error('Error deleting profile:', error);
     }
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -77,23 +110,23 @@ function ProfileManagement() {
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Phone</TableCell>
+              <TableCell>PAN Number</TableCell>
               <TableCell>Bank Account</TableCell>
               <TableCell>Branch</TableCell>
               <TableCell>IFSC</TableCell>
-              <TableCell>PAN Number</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {profiles.map(profile => (
-              <TableRow key={profile._id}>
+            {profiles?.length>0 && profiles.map(profile => (
+              <TableRow key={profile?._id}>
                 <TableCell>{profile.name}</TableCell>
                 <TableCell>{profile.email}</TableCell>
-                <TableCell>{profile.phone}</TableCell>
-                <TableCell>{profile.bankDetails ? profile.bankDetails.accountNo : ''}</TableCell>
-                <TableCell>{profile.bankDetails ? profile.bankDetails.branch : ''}</TableCell>
-                <TableCell>{profile.bankDetails ? profile.bankDetails.ifsc : ''}</TableCell>
-                <TableCell>{profile.panNumber}</TableCell>
+                <TableCell>{profile.phone || '-'}</TableCell>
+                <TableCell>{profile.panNo || profile.panNumber || '-'}</TableCell>
+                <TableCell>{profile.bankDetails?.accountNo || '-'}</TableCell>
+                <TableCell>{profile.bankDetails?.branch || '-'}</TableCell>
+                <TableCell>{profile.bankDetails?.ifsc || '-'}</TableCell>
                 <TableCell>
                   <IconButton color="primary" onClick={() => handleEditProfile(profile)}><EditIcon /></IconButton>
                   <IconButton color="secondary" onClick={() => handleDeleteProfile(profile._id)}><DeleteIcon /></IconButton>
@@ -104,22 +137,59 @@ function ProfileManagement() {
         </Table>
       )}
 
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>Add Customer</Button>
+      <Box mt={2}>
+        <Button variant="contained" color="primary" onClick={() => { setIsEditMode(false); setOpen(true);setCurrentProfile({
+        id: null,
+        name: '',
+        email: '',
+        password: '',
+        phone: '',
+        panNo: '',
+        bankDetails: { name: '', accountNo: '', branch: '', ifsc: '' },
+        isActive: false
+      }); }}>Add Customer</Button>
+      </Box>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{currentProfile.id ? 'Edit Customer' : 'Add Customer'}</DialogTitle>
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{isEditMode ? 'Edit Customer' : 'Add Customer'}</DialogTitle>
         <DialogContent>
-          <TextField label="Name" name="name" value={currentProfile.name} onChange={handleInputChange} fullWidth />
-          <TextField label="Email" name="email" value={currentProfile.email} onChange={handleInputChange} fullWidth />
-          <TextField label="Phone" name="phone" value={currentProfile.phone} onChange={handleInputChange} fullWidth />
-          <TextField label="Account Number" name="bankDetails.accountNo" value={currentProfile.bankDetails.accountNo} onChange={handleInputChange} fullWidth />
-          <TextField label="Branch" name="bankDetails.branch" value={currentProfile.bankDetails.branch} onChange={handleInputChange} fullWidth />
-          <TextField label="IFSC" name="bankDetails.ifsc" value={currentProfile.bankDetails.ifsc} onChange={handleInputChange} fullWidth />
-          <TextField label="PAN Number" name="panNumber" value={currentProfile.panNumber} onChange={handleInputChange} fullWidth />
+          <Box display="flex" flexDirection="column" gap={2} p={1}>
+            <TextField label="Name" name="name" value={currentProfile.name} onChange={handleInputChange} fullWidth />
+            <TextField label="Email" name="email" value={currentProfile.email} onChange={handleInputChange} fullWidth />
+            {!isEditMode && (
+              <TextField
+                label="Password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                value={currentProfile.password}
+                onChange={handleInputChange}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            )}
+            <TextField label="Phone" name="phone" value={currentProfile.phone} onChange={handleInputChange} fullWidth />
+            <TextField label="PAN Number" name="panNo" value={currentProfile.panNo || currentProfile.panNumber} onChange={handleInputChange} fullWidth />
+            <TextField label="Account Holder Name" name="bankDetails.name" value={currentProfile.bankDetails.name} onChange={handleInputChange} fullWidth />
+            <TextField label="Account Number" name="bankDetails.accountNo" value={currentProfile.bankDetails.accountNo} onChange={handleInputChange} fullWidth />
+            <TextField label="Branch" name="bankDetails.branch" value={currentProfile.bankDetails.branch} onChange={handleInputChange} fullWidth />
+            <TextField label="IFSC" name="bankDetails.ifsc" value={currentProfile.bankDetails.ifsc} onChange={handleInputChange} fullWidth />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="primary">Cancel</Button>
-          <Button onClick={handleAddProfile} color="primary">{currentProfile.id ? 'Save' : 'Add'}</Button>
+          <Button onClick={handleSaveProfile} color="primary">{isEditMode ? 'Save' : 'Add'}</Button>
         </DialogActions>
       </Dialog>
     </div>
