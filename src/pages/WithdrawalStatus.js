@@ -16,7 +16,7 @@ function WithdrawalStatus() {
     setLoading(true);
     try {
       const response = await apiService.getFund(); // Assuming withdrawals are part of the fund data for simplicity
-      setWithdrawals(response);
+      setWithdrawals(response?.data);
       setBalancePayable(0); // Set the balance payable as needed
     } catch (error) {
       console.error('Error fetching withdrawals:', error);
@@ -57,7 +57,7 @@ function WithdrawalStatus() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {withdrawals.map(withdrawal => (
+          {withdrawals?.length>0 && withdrawals.map(withdrawal => (
             <TableRow key={withdrawal.id}>
               <TableCell>{withdrawal.date}</TableCell>
               <TableCell>${withdrawal.amount}</TableCell>

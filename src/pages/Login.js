@@ -1,42 +1,71 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Box, Paper, Avatar } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Paper, Avatar, IconButton, InputAdornment } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import apiService from '../api/apiService';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const navigate =useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      toast.error('Please fill in all fields.');
-      return;
+    let valid = true;
+    setEmailError('');
+    setPasswordError('');
+
+    if (!email) {
+      setEmailError('Please enter your email.');
+      valid = false;
     }
-  
+
+    if (!password) {
+      setPasswordError('Please enter your password.');
+      valid = false;
+    }
+
+    if (!valid) return;
+
     try {
       const response = await apiService.login(email, password);
       if (response.status) {
-        console.log(response);
-        
         toast.success('Login successful!');
         // Store the token in local storage
         localStorage.setItem('authToken', response.token);
-        // Redirect or perform other actions after successful login
+        // Redirect to the home page after successful login
+        navigate('/home');
       } else {
-        toast.error(response.message || 'Invalid email or password.');
+        if (response.message.toLowerCase().includes('email')) {
+          setEmailError(response.message);
+        } else {
+          setPasswordError(response.message);
+        }
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        toast.error(error.response.data.message || 'Invalid email or password.');
+        const message = error.response.data.message || 'Invalid email or password.';
+        if (message.toLowerCase().includes('email')) {
+          setEmailError(message);
+        } else {
+          setPasswordError(message);
+        }
       } else {
         toast.error('An error occurred. Please try again.');
       }
       console.error('Login error:', error);
     }
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -60,7 +89,7 @@ function Login() {
           </Typography>
           <form onSubmit={handleSubmit} style={{ width: '100%', marginTop: '10px' }}>
             <TextField
-            size='small'
+              size="small"
               variant="outlined"
               margin="normal"
               required
@@ -72,25 +101,40 @@ function Login() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={!!emailError}
+              helperText={emailError}
             />
             <TextField
-                        size='small'
-
+              size="small"
               variant="outlined"
               margin="normal"
               required
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              error={!!passwordError}
+              helperText={passwordError}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
             <Button
-                        size='small'
-
+              size="small"
               type="submit"
               fullWidth
               variant="contained"

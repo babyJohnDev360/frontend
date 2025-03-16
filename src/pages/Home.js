@@ -1,10 +1,13 @@
 import React from 'react';
 import { Grid, Typography, Button, Card, CardContent, CardHeader, Table } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function Home() {
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}><Typography variant="h4">Admin Dashboard</Typography></Grid>
+      <Grid item xs={12}>
+        <Typography variant="h4">Admin Dashboard</Typography>
+      </Grid>
       
       <Grid container spacing={2}>
         <Grid item xs={6} md={3}>
@@ -33,14 +36,34 @@ function Home() {
         </Grid>
       </Grid>
 
-      <Grid item xs={12}><Typography variant="h6">Live Stock Ticker</Typography></Grid>
-      <Grid item xs={12}><Table> {/* Stock Ticker Table */} </Table></Grid>
+      <Grid item xs={12}>
+        <Typography variant="h6">Live Stock Ticker</Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Table> {/* Stock Ticker Table */} </Table>
+      </Grid>
 
       <Grid item xs={12} container spacing={2}>
-        <Grid item xs={3}><Button variant="contained" fullWidth>Profile</Button></Grid>
-        <Grid item xs={3}><Button variant="contained" fullWidth>Trading Summary</Button></Grid>
-        <Grid item xs={3}><Button variant="contained" fullWidth>Transactions</Button></Grid>
-        <Grid item xs={3}><Button variant="contained" fullWidth>Withdrawal Status</Button></Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" fullWidth component={Link} to="/profile-management">
+            Profile
+          </Button>
+        </Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" fullWidth component={Link} to="/trading-summary">
+            Trading Summary
+          </Button>
+        </Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" fullWidth component={Link} to="/transactions">
+            Transactions
+          </Button>
+        </Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" fullWidth component={Link} to="/withdrawal-status">
+            Withdrawal Status
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );

@@ -20,6 +20,13 @@ const handleError = (error) => {
   }
   console.error('Config:', error.config);
 };
+
+// Helper function to get the authorization header from local storage
+const getAuthHeader = () => {
+  const token = localStorage.getItem('authToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const apiService = {
   login: async (email, password) => {
     try {
@@ -34,7 +41,7 @@ const apiService = {
   createUser: async (userData) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/user/signup`, userData, {
-        headers: { Authorization: `Bearer YOUR_TOKEN_HERE` },
+        headers: getAuthHeader(),
       });
       return response.data;
     } catch (error) {
@@ -45,7 +52,9 @@ const apiService = {
 
   updateUser: async (userData) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/user/edit`, userData);
+      const response = await axios.put(`${API_BASE_URL}/user/edit`, userData, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -55,7 +64,9 @@ const apiService = {
 
   deleteUser: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/user/${id}`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -65,7 +76,9 @@ const apiService = {
 
   listUsers: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/user/list`);
+      const response = await axios.get(`${API_BASE_URL}/user/list`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -75,7 +88,9 @@ const apiService = {
 
   addFund: async (fundData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/addFund`, fundData);
+      const response = await axios.post(`${API_BASE_URL}/user/addFund`, fundData, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -85,7 +100,9 @@ const apiService = {
 
   updateFund: async (fundData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/updateFund`, fundData);
+      const response = await axios.post(`${API_BASE_URL}/user/updateFund`, fundData, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -95,7 +112,9 @@ const apiService = {
 
   getFund: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/user/getFund`);
+      const response = await axios.get(`${API_BASE_URL}/user/getFund`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -105,7 +124,9 @@ const apiService = {
 
   removeFund: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/removeFund/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/user/removeFund/${id}`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -115,7 +136,9 @@ const apiService = {
 
   updateServiceFee: async (feeData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/updateServiceFee`, feeData);
+      const response = await axios.post(`${API_BASE_URL}/user/updateServiceFee`, feeData, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -125,7 +148,9 @@ const apiService = {
 
   getServiceFee: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/user/getServiceFee`);
+      const response = await axios.get(`${API_BASE_URL}/user/getServiceFee`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -135,7 +160,9 @@ const apiService = {
 
   removeServiceFee: async (id) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/user/removeServiceFee/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/user/removeServiceFee/${id}`, {
+        headers: getAuthHeader(),
+      });
       return response.data;
     } catch (error) {
       handleError(error);
