@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 
 const API_BASE_URL = 'https://backend-squ3.onrender.com';
 // const API_BASE_URL = 'http://localhost:4000';

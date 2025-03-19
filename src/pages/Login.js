@@ -4,9 +4,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import apiService from '../api/apiService';
+
 import { useNavigate } from 'react-router-dom';
+import apiService from '../api/apiService';
 
 function Login() {
   const [email, setEmail] = useState('');
